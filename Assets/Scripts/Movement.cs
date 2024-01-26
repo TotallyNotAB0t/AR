@@ -134,7 +134,7 @@ public class Movement : MonoBehaviour
         characterAnimator = GetComponent<Animator>();
 
         //Récupération des animator d'autres GameObject
-        treeAnimator = GameObject.Find("Tree_02").GetComponent<Animator>();
+        //treeAnimator = GameObject.Find("Tree_02").GetComponent<Animator>();
         lastCollectible = GameObject.Find("Cube.001").GetComponent<Animator>();
 
         //On empêche le personnage de passer a travers les colliders lors du lancement
