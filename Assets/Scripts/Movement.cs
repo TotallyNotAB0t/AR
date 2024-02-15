@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Vuforia;
 using UnityEngine.SceneManagement;
@@ -15,16 +16,18 @@ public class Movement : MonoBehaviour
     private Transform firstPos;
     private Vector3 lastPos;
     public float rotationSpeed;
-    private bool isPressed;
     private GameObject pressurePlate;
     private int collectibleCount = 0;
     private Animator treeAnimator;
     private Animator lastCollectible;
+    public ImageTargetBehaviour[] images;
+    private bool trackingLost;
 
 
     //Gère les mouvements à partir d'inputs du clavier
     private void InputMovements()
     {
+        if (trackingLost) return;
         //Récuparation des mouvements à partir du clavier
         float horizontalInput = SimpleInput.GetAxis("Horizontal");
         float verticalInput = SimpleInput.GetAxis("Vertical");
@@ -78,20 +81,6 @@ public class Movement : MonoBehaviour
             isGrounded = true;
         }
 
-        if (collision.gameObject.name == "PressurePlate")
-        {
-            isPressed = true;
-            pressurePlate = collision.gameObject;
-        }
-    }
-
-    private void PressurePlatePressed()
-    {
-        if (isPressed && pressurePlate.transform.position.y > -0.01f)
-        {
-            pressurePlate.transform.position = pressurePlate.transform.position + new Vector3(0, -0.00001f, 0);
-            treeAnimator.SetBool("treeFalls", true);
-        }
     }
 
     private void UnlockLastCollectible()
@@ -121,9 +110,26 @@ public class Movement : MonoBehaviour
         //On reload la scene si on tombe
         if (other.gameObject.name == "FailSafe")
         {
-            SceneManager.LoadScene(0);
+            foreach (var image in images)
+            {
+                if (image.TargetStatus.Status == Status.TRACKED)
+                {
+                    transform.position = image.transform.position + Vector3.up;
+                    return;
+                }
+            }
+            StartCoroutine(WaitForTracking());
         }
+    }
 
+    private IEnumerator WaitForTracking()
+    {
+        trackingLost = true;
+        transform.position = Vector3.up;
+        characterBody.constraints = RigidbodyConstraints.FreezeAll;
+        yield return new WaitUntil(() => images[0].TargetStatus.Status == Status.TRACKED);
+        characterBody.constraints = RigidbodyConstraints.FreezeRotation;
+        trackingLost = false;
     }
 
     // Start is called before the first frame update
@@ -132,13 +138,7 @@ public class Movement : MonoBehaviour
         //Récupération du rigidbody de l'élément attaché a ce script
         characterBody = GetComponent<Rigidbody>();
         characterAnimator = GetComponent<Animator>();
-
-        //Récupération des animator d'autres GameObject
-        //treeAnimator = GameObject.Find("Tree_02").GetComponent<Animator>();
-        //lastCollectible = GameObject.Find("Cube.001").GetComponent<Animator>();
-
-        //On empêche le personnage de passer a travers les colliders lors du lancement
-        PositionAndRotationFreeze(characterBody);
+        isGrounded = false;
 
         SetupIsMoving();
 
@@ -153,7 +153,6 @@ public class Movement : MonoBehaviour
         InputMovements();
         Animation();
         CheckIfMoving();
-        PressurePlatePressed();
         UnlockLastCollectible();
     }
 
@@ -179,11 +178,10 @@ public class Movement : MonoBehaviour
         }
 
         //Si on perds l'image, on stoppe notre personnage sur tous les axes
-        if (imageTarget.TargetStatus.Status == Status.NO_POSE)
+        /*if (imageTarget.TargetStatus.Status == Status.NO_POSE)
         {
+            Debug.Log("no");
             PositionAndRotationFreeze(characterBody);
-        }
-
-
+        }*/
     }
 }
