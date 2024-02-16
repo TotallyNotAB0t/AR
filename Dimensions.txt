@@ -1,3 +1,0 @@
-default scale image3 : 
-0.06985
-0.12065

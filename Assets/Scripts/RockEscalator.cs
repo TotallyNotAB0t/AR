@@ -16,7 +16,6 @@ public class RockEscalator : MonoBehaviour
         target = up;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!Activated) return;

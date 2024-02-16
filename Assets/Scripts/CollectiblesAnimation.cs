@@ -9,7 +9,6 @@ public class CollectiblesAnimation : MonoBehaviour
     public float rotationSpeed;
     private bool used;
 
-    // Update is called once per frame
     void Update()
     {
         transform.Rotate(rotationSpeed * Time.deltaTime * rotationAngle);

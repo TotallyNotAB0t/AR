@@ -1,3 +1,4 @@
+
 # Project Documentation
 
 ## Overview
@@ -9,6 +10,16 @@ The player controls a little robot that can walk on cards. The cards of the help
 - **Development Time** : Approximately 40 hours
 - **Players required** : 2-3
 - **Average playing time** : 10 minutes
+
+### Problems encountered :
+- Lots of tweaking considering the size of our cards / the instantiated platforms.
+Changing the gravity and the jump force helped a lot.
+
+- The player fell a lot when the tracking made the platform tilted on unrealistic angles. The solution was to only allow the platforms to rotate on one axis and to prevent the rotation on the other axis.
+
+- The UI can be hard to read on a small phone screen. The UI follows the camera so that we can read anything from any angle.
+
+- Using the phone or the first card as the world center was not really successful. The solution was to use the Oxide marker to have a static world position that won't move.
 
 ### Setup Instructions:
 1. **Vuforia Markers**: You'll need five Vuforia markers:
@@ -24,4 +35,4 @@ The player controls a little robot that can walk on cards. The cards of the help
    - An A button to jump on the right
 
 ## Images
-![Cards Example](DocumentationImages/ExampleCards.png)
+![Cards Layout](DocumentationImages/ExampleCards.png)
